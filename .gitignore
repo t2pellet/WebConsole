@@ -1,71 +1,33 @@
-target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.classpath
-.project
-.mvn/timing.properties
+# gradle
 
-# Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
-!/.mvn/wrapper/maven-wrapper.jar
-/bin/
+.gradle/
+build/
+out/
+classes/
 
-.metadata
-bin/
-tmp/
-*.tmp
-*.bak
-*.swp
-*~.nib
-local.properties
-.settings/
-.loadpath
-.recommenders
+# eclipse
 
-# External tool builders
-.externalToolBuilders/
-
-# Locally stored "Eclipse launch configurations"
 *.launch
 
-# PyDev specific (Python IDE for Eclipse)
-*.pydevproject
+# idea
 
-# CDT-specific (C/C++ Development Tooling)
-.cproject
+.idea/
+*.iml
+*.ipr
+*.iws
 
-# CDT- autotools
-.autotools
+# vscode
 
-# Java annotation processor (APT)
-.factorypath
+.settings/
+.vscode/
+bin/
+.classpath
+.project
 
-# PDT-specific (PHP Development Tools)
-.buildpath
+# macos
 
-# sbteclipse plugin
-.target
+*.DS_Store
 
-# Tern plugin
-.tern-project
+# fabric
 
-# TeXlipse plugin
-.texlipse
-
-# STS (Spring Tool Suite)
-.springBeans
-
-# Code Recommenders
-.recommenders/
-
-# Annotation Processing
-.apt_generated/
-
-# Scala IDE specific (Scala & Java development for Eclipse)
-.cache-main
-.scala_dependencies
-.worksheet
+run/

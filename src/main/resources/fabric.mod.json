@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "webconsole",
+  "version": "${version}",
+
+  "name": "WebConsole Fabric",
+  "description": "Port of the WebConsole plugin to Fabric",
+  "authors": [
+    "MesaCarlos",
+    "CommodoreThrawn"
+  ],
+  "contact": {
+    "sources": "https://github.com/mesacarlos/WebConsole"
+  },
+
+  "license": "CC0-1.0",
+
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "es.mesacarlos.webconsole.WebConsole"
+    ]
+  },
+  "mixins": [
+    "webconsole.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": "*",
+    "minecraft": "1.18.x",
+    "cloth-config": ">=6.1.48",
+    "java": ">=17"
+  }
+}

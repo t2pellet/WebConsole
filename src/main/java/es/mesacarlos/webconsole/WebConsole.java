@@ -12,7 +12,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.lingala.zip4j.ZipFile;
 import net.minecraft.server.MinecraftServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,8 +21,6 @@ import javax.net.ssl.KeyManagerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.security.KeyStore;
 
 public class WebConsole implements ModInitializer {
@@ -55,29 +52,6 @@ public class WebConsole implements ModInitializer {
 		// Register command
 		CommandRegistrationCallback.EVENT.register(WebConsoleCommand::register);
 
-		// Unzip server
-		File wcFolder = new File(WEB_PATH);
-		// Extract server if it isn't there
-		File htmlFile = new File(wcFolder, "index.html");
-		if (!htmlFile.exists()) {
-			LOGGER.info(Internationalization.getPhrase("unzip"));
-			wcFolder.mkdirs();
-			try {
-				// Copy zip
-				InputStream is = WebConsole.class.getResourceAsStream("/client.zip");
-				File wcZipFile = new File(wcFolder, "client.zip");
-				Files.copy(is, wcZipFile.toPath());
-				// Unzip
-				ZipFile zipFile = new ZipFile(wcZipFile);
-				zipFile.extractAll(wcFolder.getAbsolutePath());
-				Files.deleteIfExists(wcZipFile.toPath());
-				LOGGER.info(Internationalization.getPhrase("unzip-success"));
-			} catch (IOException ex) {
-				LOGGER.error(Internationalization.getPhrase("unzip-error") + ex.getMessage());
-				ex.printStackTrace();
-			}
-		}
-
 		// On Server Start
 		ServerLifecycleEvents.SERVER_STARTING.register(mcServer -> {
 			WebConsole.mcServer = mcServer;
@@ -108,9 +82,7 @@ public class WebConsole implements ModInitializer {
 	 */
 	private void startWS() throws Exception {
 		// Create WebSocket server
-		String host = WCConfig.getInstance().useIntegratedWebServer ? WCConstants.IMPLICIT_SOCKET_HOST : WCConfig.getInstance().host;
-		int port = WCConfig.getInstance().useIntegratedWebServer ? WCConstants.IMPLICIT_SOCKET_PORT : WCConfig.getInstance().port;
-		server = new WCServer(host, port);
+		server = new WCServer(WCConfig.getInstance().host, WCConfig.getInstance().socketPort);
 
 		if(WCConfig.getInstance().isSslEnabled()) {
 			// Configure SSL

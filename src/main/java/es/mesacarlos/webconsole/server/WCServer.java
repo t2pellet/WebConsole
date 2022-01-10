@@ -25,9 +25,8 @@ public class WCServer extends NanoWSD {
 	public WCServer(String host, int port) {
 		super(host, port);
 		if (WCConfig.getInstance().useIntegratedWebServer) {
-			clientServer = new WebServer(WCConfig.getInstance().host, WCConfig.getInstance().port);
+			clientServer = new WebServer(host, WCConfig.getInstance().clientPort);
 		} else clientServer = null;
-		WebConsole.LOGGER.info("Started WebConsole WebSocket server at port " + WCConfig.getInstance().port);
 	}
 
 	@Override

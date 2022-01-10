@@ -38,8 +38,11 @@ public class WCConfig implements ConfigData {
 	@ConfigEntry.Category("Connection")
 	public boolean useIntegratedWebServer = true;
 	@ConfigEntry.Category("Connection")
-	@Comment("Port for client server if enabled, socket server otherwise. Cannot use port 8080 if webserver enabled")
-	public int port = 8081;
+	@Comment("Port for the client web server (if enabled)")
+	public int clientPort = 8081;
+	@ConfigEntry.Category("Connection")
+	@Comment("Port for the socket server")
+	public int socketPort = 8080;
 
 	@ConfigEntry.Category("Language")
 	public String language = "en";
@@ -69,36 +72,11 @@ public class WCConfig implements ConfigData {
 	}
 
 	/**
-	 * Get host and port fields already as InetSocketAddress
-	 * @return InetSocketAddress created from the fields host and port of config.yml
-	 */
-	public InetSocketAddress getSocketAdress() {
-		return new InetSocketAddress(host, port);
-	}
-
-	/**
 	 * Language code from config.yml
 	 * @return language code
 	 */
 	public String getLanguage() {
 		return language;
-	}
-
-
-	/**
-	 * Get all admins as a UserData list
-	 * @return list of admin users
-	 */
-	private List<UserData> getAdmins() {
-		return users.stream().filter(u -> u.getUserType() == UserType.ADMIN).toList();
-	}
-
-	/**
-	 * Get all viewers as a UserData list
-	 * @return list of viewer users
-	 */
-	private List<UserData> getViewers() {
-		return users.stream().filter(u -> u.getUserType() == UserType.VIEWER).toList();
 	}
 
 	/**

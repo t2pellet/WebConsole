@@ -23,19 +23,16 @@ Don't worry about privacy or security: all data is stored in your browser locall
 
 1. Download mod from [Releases](https://www.curseforge.com/minecraft/mc-mods/webconsole/files).
 2. Start your server to see the webconsole.json5 config file. Should appear like this:
-![image](https://user-images.githubusercontent.com/4323034/148812775-4f641d8c-8b9c-4432-be27-7cfccded2c09.png)
+![image](https://i.imgur.com/G4WoOlu.png)
+3. Ensure both the client and socket port are port-forwarded.
 
 A explanation of the `host`, `port`, `language` and `passwords` fields follows:
-
-`host`: Leaving it as 127.0.0.1 will do the trick. If you experience issues , you can change this value to your device IP. If you are in a VPS or dedicated server (or you have a full public IP allocated for your device) type your public IP. If you are at your home (and you don't have a public IP assigned to your device) type your private IP, it is probably something like 192.168.xx.xx.
-
-`port`: A port where to run this plugin (cannot be the port you are using for Minecraft). Port is for the client server if enabled, for the web socket server otherwise.
-
-`useIntegratedWebServer`: Determines whether to enable the integrated web client server or not
-
-You can modify `language` to view console and command messages in your preferred language. Valid languages are English (`en`), Spanish (`es`), Chinese (`zh`), Czech (`cs`), Deutsch (`de`), Dutch (`nl`), French (`fr`), Italian (`it`), Japanese (`ja`) Korean (`ko`), Portuguese (`pt`), Russian (`ru`) and Turkish (`tr`). **IMPORTANT: There is a known issue with Microsoft Windows cmd that shows weird characters when using a language different than English. If you are using Windows to host your server, check [this wiki page](https://github.com/mesacarlos/WebConsole/wiki/Show-local-characters-in-Windows-Console) to solve the problem**.
-
-You can modify the `users` array to add/remove/edit different users with varying permissions for accessing the web console. By default, an "admin" user is created as an example for the syntax.
+- `host`: Leaving it as 0.0.0.0 will do the trick. If you experience issues , you can change this value to your device IP. If you are in a VPS or dedicated server (or you have a full public IP allocated for your device) type your public IP. If you are at your home (and you don't have a public IP assigned to your device) type your private IP, it is probably something like 192.168.xx.xx.
+- `useIntegratedWebServer`: Determines whether to enable the integrated web client server or not
+- `clientPort`: The port for the integrated web server, if enabled. Must be port forwarded if `useIntegratedWebServer==true`
+- `socketPort`: The port for the WebSocket server. Must be port forwarded
+- You can modify `language` to view console and command messages in your preferred language. Valid languages are English (`en`), Spanish (`es`), Chinese (`zh`), Czech (`cs`), Deutsch (`de`), Dutch (`nl`), French (`fr`), Italian (`it`), Japanese (`ja`) Korean (`ko`), Portuguese (`pt`), Russian (`ru`) and Turkish (`tr`). **IMPORTANT: There is a known issue with Microsoft Windows cmd that shows weird characters when using a language different than English. If you are using Windows to host your server, check [this wiki page](https://github.com/mesacarlos/WebConsole/wiki/Show-local-characters-in-Windows-Console) to solve the problem**.
+- You can modify the `users` array to add/remove/edit different users with varying permissions for accessing the web console. By default, an "admin" user is created as an example for the syntax.
 
 The rest of the fields are used for SSL configuration. You can learn how to activate SSL [here](https://github.com/mesacarlos/WebConsole/wiki/SSL-Configuration). SSL **is not** required for WebConsole to work, you can still use it without encription, unless you are hosting your client in a HTTPS server, in this case is mandatory to enable SSL in all your servers due to web browsers restrictions.
 
@@ -43,11 +40,11 @@ The rest of the fields are used for SSL configuration. You can learn how to acti
 ## Using web interface
 
 By default, the mod will run an integrated web client server as well as the web socket server.
-- The WebSocket server will be at port 80
-- The WebServer will use the port specified in config
-- You can disable the integrated web server via the config (then the port in config will be for websocket server)
+- The WebSocket server will be at `host : socketPort` specified in config
+- The WebServer will use `clientPort` specified in config
+- You can disable the integrated web server via `useIntegratedWebServer` in the config
 
-You can download the main web interface from [Releases](https://github.com/t2pellet/WebConsole/releases) or from [MesaCarlos' releases](https://github.com/mesacarlos/WebConsole/releases) if you want an interface supporting multiple different servers.
+You can download the client web interface from [Releases](https://github.com/t2pellet/WebConsole/releases) or from [MesaCarlos' releases](https://github.com/mesacarlos/WebConsole/releases) if you want an interface supporting multiple different servers.
 
 ## Check connected WebConsole clients
 Since v1.3, you can use /WebConsole command to view how many clients are connected and their IP address. This is the only Minecraft command provided by this plugin. This command requires you to have `webconsole.webconsole` permission to execute it.
@@ -55,7 +52,7 @@ Since v1.3, you can use /WebConsole command to view how many clients are connect
 
 ## Technical information
 
-You can find how client and server comunicate [here](https://github.com/mesacarlos/WebConsole/wiki/WebSocket-commands-and-responses).
+You can find how client and server communicate [here](https://github.com/mesacarlos/WebConsole/wiki/WebSocket-commands-and-responses).
 
 ## Bugs, suggestions or problems configuring WebConsole?
 You can open an issue on [GitHub](https://github.com/t2pellet/WebConsole/issues)

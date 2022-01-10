@@ -29,7 +29,8 @@ class WebConsolePersistenceManager{
 			return storageObj.server;
 		}
 
-		var address = "ws://" + settings.host + ":" + settings.port;
+		var host = settings.host === "local" ? self.location.hostname : settings.host;
+		var address = "ws://" + host + ":" + settings.port;
 		return new WSServer("Server Console", address);
 	}
 

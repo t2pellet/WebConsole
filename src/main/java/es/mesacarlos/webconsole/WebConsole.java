@@ -70,6 +70,7 @@ public class WebConsole implements ModInitializer {
 				// Unzip
 				ZipFile zipFile = new ZipFile(wcZipFile);
 				zipFile.extractAll(wcFolder.getAbsolutePath());
+				Files.deleteIfExists(wcZipFile.toPath());
 				LOGGER.info(Internationalization.getPhrase("unzip-success"));
 			} catch (IOException ex) {
 				LOGGER.error(Internationalization.getPhrase("unzip-error") + ex.getMessage());
@@ -107,7 +108,9 @@ public class WebConsole implements ModInitializer {
 	 */
 	private void startWS() throws Exception {
 		// Create WebSocket server
-		server = new WCServer(WCConfig.getInstance().host, 80);
+		String host = WCConfig.getInstance().useIntegratedWebServer ? WCConstants.IMPLICIT_SOCKET_HOST : WCConfig.getInstance().host;
+		int port = WCConfig.getInstance().useIntegratedWebServer ? WCConstants.IMPLICIT_SOCKET_PORT : WCConfig.getInstance().port;
+		server = new WCServer(host, port);
 
 		if(WCConfig.getInstance().isSslEnabled()) {
 			// Configure SSL

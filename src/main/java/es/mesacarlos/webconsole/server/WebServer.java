@@ -1,6 +1,7 @@
 package es.mesacarlos.webconsole.server;
 
 import com.google.gson.JsonObject;
+import es.mesacarlos.webconsole.WCConstants;
 import es.mesacarlos.webconsole.WebConsole;
 import es.mesacarlos.webconsole.config.WCConfig;
 import fi.iki.elonen.NanoHTTPD;
@@ -27,8 +28,8 @@ class WebServer extends NanoHTTPD {
         // Create settings file
         File settingsFile = new File(WebConsole.WEB_PATH, "settings.json");
         JsonObject settingsJson = new JsonObject();
-        settingsJson.addProperty("port", WCConfig.getInstance().useIntegratedWebServer ? 80 : WCConfig.getInstance().port);
-        settingsJson.addProperty("host", WCConfig.getInstance().host);
+        settingsJson.addProperty("port", WCConstants.IMPLICIT_SOCKET_PORT);
+        settingsJson.addProperty("host", WCConstants.IMPLICIT_SOCKET_HOST);
         settingsJson.addProperty("ssl", WCConfig.getInstance().isSslEnabled());
         BufferedWriter bw = new BufferedWriter(new FileWriter(settingsFile));
         bw.write(settingsJson.toString());

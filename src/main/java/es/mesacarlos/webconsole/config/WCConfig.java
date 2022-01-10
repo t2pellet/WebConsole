@@ -9,14 +9,16 @@ import me.shedaniel.autoconfig.annotation.Config;
 
 import es.mesacarlos.webconsole.WebConsole;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 
 @Config(name = WebConsole.MODID)
 public class WCConfig implements ConfigData {
 	private static WCConfig instance;
 
 	public static WCConfig getInstance() {
-		if(instance == null)
+		if(instance == null) {
 			instance = AutoConfig.getConfigHolder(WCConfig.class).getConfig();
+		}
 		return instance;
 	}
 
@@ -32,11 +34,12 @@ public class WCConfig implements ConfigData {
 	public String KeyPassword = "keypassword";
 
 	@ConfigEntry.Category("Connection")
-	public String host = "127.0.0.1";
+	public String host = "0.0.0.0";
 	@ConfigEntry.Category("Connection")
 	public boolean useIntegratedWebServer = true;
 	@ConfigEntry.Category("Connection")
-	public int port = 8080;
+	@Comment("Port for client server if enabled, socket server otherwise. Cannot use port 8080 if webserver enabled")
+	public int port = 8081;
 
 	@ConfigEntry.Category("Language")
 	public String language = "en";

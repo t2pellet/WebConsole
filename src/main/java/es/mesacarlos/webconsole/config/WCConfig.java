@@ -11,12 +11,12 @@ import es.mesacarlos.webconsole.WebConsole;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 
 @Config(name = WebConsole.MODID)
-public class WebConsoleConfig implements ConfigData {
-	private static WebConsoleConfig instance;
+public class WCConfig implements ConfigData {
+	private static WCConfig instance;
 
-	public static WebConsoleConfig getInstance() {
+	public static WCConfig getInstance() {
 		if(instance == null)
-			instance = AutoConfig.getConfigHolder(WebConsoleConfig.class).getConfig();
+			instance = AutoConfig.getConfigHolder(WCConfig.class).getConfig();
 		return instance;
 	}
 
@@ -32,7 +32,9 @@ public class WebConsoleConfig implements ConfigData {
 	public String KeyPassword = "keypassword";
 
 	@ConfigEntry.Category("Connection")
-	public String host = "0.0.0.0";
+	public String host = "127.0.0.1";
+	@ConfigEntry.Category("Connection")
+	public boolean useIntegratedWebServer = true;
 	@ConfigEntry.Category("Connection")
 	public int port = 8080;
 

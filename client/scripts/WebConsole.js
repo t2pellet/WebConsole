@@ -13,42 +13,26 @@ var lang;
 var autoPasswordCompleted = false; //When true, saved password was used. If a 401 is received, then saved password is not correct
 var statusCommandsInterval = -1;
 var commandHistoryIndex = -1; //Saves current command history index. -1 when not browsing history.
+var settings = getSettings();
 
-/**
- * Load list of servers in file servers.json
- * and auto update in next request when file is changed
- */
-function readServerList() {
-	let hash = persistenceManager.getSetting('server:hash')
 
-	/**
-	 * Hash code function used for compare version of file servers.json
-	 * https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
-	 */
-	const hashCode = s => s.split('').reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);
-
-	fetch('servers.json')
-		.then(res => res.text())
-		.then(json => {
-			if (hash !== hashCode(json)) {
-				persistenceManager.setSetting('server:hash', hashCode(json))
-				JSON.parse(json).forEach(server => persistenceManager.saveServer(server))
-			}
-		})
-		.then(updateServerList)
-		.catch(() => console.info('Ignore load new list in file servers.json.'));
+function getSettings() {
+	var rq = new XMLHttpRequest();
+	rq.open("GET", "../settings.json", false);
+	rq.send(null);
+	return JSON.parse(rq.responseText);
 }
 
 /**
 * Prepare and show server to user
 */
-function openServer(serverName){
+function openServer() {
 	//Hide welcome div if user is not in welcome page
 	$("#welcomeContainer").hide();
 	$("#serverContainer").show();
 	
 	//Change server name and related info
-	$("#serverTitle").text(serverName);
+	$("#serverTitle").text("Server Console");
 	$("#consoleTextArea").text("");
 	$("#commandInput").prop("disabled", false);
 	$("#sendCommandButton").prop("disabled", false);
@@ -58,7 +42,7 @@ function openServer(serverName){
 	commandHistoryIndex = -1; //Reset command history index
 	
 	//Create or retrieve connection
-	connectionManager.loadConnection(serverName);
+	connectionManager.loadConnection();
 	
 	//Load saved messages
 	var i;
@@ -278,23 +262,4 @@ function backToHomepage(){
 	
 	$("#welcomeContainer").show();
 	$("#serverContainer").hide();
-}
-
-/**
-* Update dropdown with saved server list
-*/
-function updateServerList(){
-	//Delete all servers in dropdown
-	$('.servermenuitem').remove();
-	
-	//Add all servers
-	var servers = persistenceManager.getAllServers();
-	for(var i = 0; i < servers.length; i++){
-		$('#ServerListDropDown').append('<a class="dropdown-item servermenuitem" href="#" onclick="openServer(\'' + servers[i].serverName + '\')">' + servers[i].serverName.replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/'/g,"").replace(/"/g,"") + '</a>');
-	}
-	
-	//Show a "no servers" message when no servers are added
-	if(servers.length == 0){
-		$('#ServerListDropDown').append('<a class="dropdown-item servermenuitem disabled" href="#" id="noServersAdded">No servers added</a>');
-	}
 }

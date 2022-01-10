@@ -12,24 +12,14 @@ class WebConsoleManager {
 	/**
 	* Loads a existing connection or creates a new one
 	*/
-	loadConnection(serverName){
+	loadConnection() {
 		//If a connection is already active, delete all subscribers
 		if(this.activeConnection){
 			this.activeConnection.removeSubscribers();
 		}
 		
-		//If connection exists, load it
-		var manager = this;
-		var i;
-		for (i = 0; i < this.activeConnections.length; i++) { 
-			if(this.activeConnections[i].serverName == serverName){
-				manager.activeConnection = this.activeConnections[i];
-				return;
-			}
-		}
-		
 		//If not created yet, create it
-		var serverObj = new WebConsolePersistenceManager().getServer(serverName);
+		var serverObj = new WebConsolePersistenceManager().getServer();
 		this.activeConnection = new WebConsoleConnector(serverObj.serverName, serverObj.serverURI);
 		this.activeConnection.connect();
 		

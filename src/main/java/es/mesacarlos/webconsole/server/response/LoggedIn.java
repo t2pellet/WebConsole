@@ -1,4 +1,4 @@
-package es.mesacarlos.webconsole.websocket.response;
+package es.mesacarlos.webconsole.server.response;
 
 import com.google.gson.JsonObject;
 
@@ -10,10 +10,6 @@ public class LoggedIn implements JSONOutput{
 	private String username;
 	private UserType as;
 	private String token;
-	
-	public LoggedIn(String message) {
-		this.message = message;
-	}
 	
 	public LoggedIn(String message, String respondsTo, String username, UserType as, String token) {
 		this.message = message;
@@ -47,12 +43,10 @@ public class LoggedIn implements JSONOutput{
 	}
 
 	public String getAs() {
-		switch(as) {
-			case ADMIN:
-				return "ADMIN";
-			default:
-				return "VIEWER"; //This is not a security hole bc its just informative...
+		if (as == UserType.ADMIN) {
+			return "ADMIN";
 		}
+		return "VIEWER"; //This is not a security hole bc its just informative...
 	}
 	
 	private String getToken() {

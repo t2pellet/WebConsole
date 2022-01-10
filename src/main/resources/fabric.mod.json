@@ -10,12 +10,12 @@
     "CommodoreThrawn"
   ],
   "contact": {
-    "sources": "https://github.com/mesacarlos/WebConsole"
+    "sources": "https://github.com/t2pellet/WebConsole"
   },
 
   "license": "CC0-1.0",
 
-  "environment": "server",
+  "environment": "*",
   "entrypoints": {
     "main": [
       "es.mesacarlos.webconsole.WebConsole"

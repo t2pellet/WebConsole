@@ -1,18 +1,16 @@
 package es.mesacarlos.webconsole.auth;
 
-import java.net.InetSocketAddress;
-
 import es.mesacarlos.webconsole.config.UserType;
 import es.mesacarlos.webconsole.util.Internationalization;
 
 public class ConnectedUser {
 	private String username;
-	private InetSocketAddress socketAddress;
+	private String socketAddress;
 	private String token;
 	private UserType userType;
 	
-	public ConnectedUser(InetSocketAddress socketAddress, String username, String token, UserType userType) {
-		this.socketAddress = socketAddress;
+	public ConnectedUser(String address, String username, String token, UserType userType) {
+		this.socketAddress = address;
 		this.username = username;
 		this.token = token;
 		this.userType = userType;
@@ -22,7 +20,7 @@ public class ConnectedUser {
 		return username;
 	}
 	
-	public InetSocketAddress getSocketAddress() {
+	public String getAddress() {
 		return socketAddress;
 	}
 	

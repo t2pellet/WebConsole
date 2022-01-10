@@ -9,69 +9,28 @@ class WebConsolePersistenceManager{
 	/**
 	* Saves or updates server into WebStorage
 	*/
-	saveServer(serverObject){
-		//Check if server exists
-		var i;
-		var found = false;
-		var servers = this.getAllServers();
-		for (i = 0; i < servers.length; i++) { 
-			if(servers[i].serverName == serverObject.serverName){
-				//Exists, replacing it
-				servers[i] = serverObject;
-				found = true;
-			}
-		}
-		
-		//Not found, adding it
-		if(found == false){
-			servers.push(serverObject);
-		}
-		
-		this.replaceAllServers(servers);
-	}
-	
-	/**
-	* Delete server from saved servers
-	*/
-	deleteServer(serverName){
-		//Find server
-		var i;
-		var index = -1;
-		var servers = this.getAllServers();
-		for (i = 0; i < servers.length; i++) { 
-			if(servers[i].serverName == serverName){
-				index = i;
-			}
-		}
-		
-		//Delete it
-		if(index > -1){
-			servers.splice(index, 1);
-		}
-		
+	saveServer(serverObject) {
+		//Retrieve saved data
+		var storageObj = JSON.parse(window.localStorage.WebConsole);
+		storageObj.server = serverObject;
+
 		//Save to WebStorage
-		this.replaceAllServers(servers);
+		window.localStorage.WebConsole = JSON.stringify(storageObj);
 	}
 	
 	/**
 	* Get server details as object
 	*/
-	getServer(serverName){
-		var i;
-		var servers = this.getAllServers();
-		for (i = 0; i < servers.length; i++) { 
-			if(servers[i].serverName == serverName){
-				return servers[i];
-			}
-		}
-	}
-	
-	/**
-	* Get all servers
-	*/
-	getAllServers(){
+	getServer() {
+		//Retrieve saved data
 		var storageObj = JSON.parse(window.localStorage.WebConsole);
-		return storageObj.servers;
+
+		if (storageObj.server != null) {
+			return storageObj.server;
+		}
+
+		var address = "ws://" + settings.host + ":" + settings.port;
+		return new WSServer("Server Console", address);
 	}
 
 	/**

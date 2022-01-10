@@ -11,8 +11,6 @@ $(document).ready(function() {
 	$("#serverContainer").hide();
 	persistenceManager.initializeSettings();
 	setLanguage(persistenceManager.getLanguage());
-	readServerList();
-	updateServerList();
 
 	//Check SSL host
 	if (location.protocol != 'https:'){
@@ -22,53 +20,7 @@ $(document).ready(function() {
 		$("#server-ssl").prop("disabled", true);
 	}
 
-	//Remove servers from persistence with invalid names. See v1.4-rev2 for details
-	var servers = persistenceManager.getAllServers();
-	for(var i = 0; i < servers.length; i++){
-		if(servers[i].serverName.includes("\'") || servers[i].serverName.includes("\"") || servers[i].serverName.includes("<") || servers[i].serverName.includes(">")){
-			persistenceManager.deleteServer(servers[i].serverName);
-		}
-	}
-});
-
-/**
-* Add server modal button click
-*/
-$("#saveAndConnectServerButton").click(function() {
-	//Validate form data
-	var addServerForm = document.getElementById("addServerForm");
-	if(!addServerForm.checkValidity()){
-		addServerForm.classList.add('was-validated');
-		return;
-	}
-	
-	//Save server
-	var name = $("#server-name").val().replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/'/g,"").replace(/"/g,"");
-	var wcIp = $("#server-ip").val();
-	var wcPort = $("#server-port").val();
-	var wcSsl = $("#server-ssl").prop('checked');
-	var uri;
-	if(wcSsl){
-		uri = "wss://" + wcIp + ":" + wcPort;
-	}else{
-		uri = "ws://" + wcIp + ":" + wcPort;
-	}
-	persistenceManager.saveServer(new WSServer(name, uri));
-
-	//Close modal
-	addServerForm.classList.remove('was-validated');
-	$("#addServerModal").modal('hide');
-
-	//Empty all modal values
-	$("#server-name").val("");
-	$("#server-ip").val("");
-	$("#server-port").val("");
-	
-	//Update GUI serverlist
-	updateServerList();
-	
-	//Connect to server
-	openServer(name);
+	openServer();
 });
 
 /**
@@ -155,29 +107,6 @@ $("#commandInput").on('keyup', function (e) {
 	}else if(e.which == 9){ //Detect tab key
 		//TODO Suggest user from connectionManager.activeConnection.players;
 	}
-
-});
-
-/**
-* On delete server button click
-*/
-$("#deleteServerButton").click(function() {
-	var name = connectionManager.activeConnection.serverName;
-	//Remove subscribers
-	connectionManager.activeConnection.removeSubscribers();
-	
-	//Delete from active connections
-	connectionManager.deleteConnection(name);
-	
-	//Back to homepage
-	backToHomepage();
-	
-	//Remove from persistence
-	persistenceManager.deleteServer(name);
-	
-	//Update dropdown
-	updateServerList();
-	
 });
 
 /**

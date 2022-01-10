@@ -1,4 +1,4 @@
-package es.mesacarlos.webconsole.websocket.response;
+package es.mesacarlos.webconsole.server.response;
 
 import com.google.gson.JsonObject;
 

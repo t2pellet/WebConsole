@@ -1,4 +1,4 @@
-package es.mesacarlos.webconsole.websocket.command;
+package es.mesacarlos.webconsole.server.command;
 
 import java.util.HashMap;
 

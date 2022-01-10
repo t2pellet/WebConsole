@@ -1,5 +1,6 @@
 package es.mesacarlos.webconsole.util;
 
+import es.mesacarlos.webconsole.server.WCServer;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.Filter;
@@ -7,13 +8,11 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.message.Message;
 
-import es.mesacarlos.webconsole.websocket.WSServer;
-
 public class LogFilter implements Filter{
-	private WSServer wsServer;
+	private WCServer wcServer;
 
-	public LogFilter(WSServer wsServer) {
-		this.wsServer = wsServer;
+	public LogFilter(WCServer WCServer) {
+		this.wcServer = WCServer;
 	}
 
 	@Override
@@ -130,8 +129,9 @@ public class LogFilter implements Filter{
 
 	@Override
 	public Result filter(LogEvent event) {
+		if (event.getLevel() == Level.OFF) return null;
 		String message = event.getMessage().getFormattedMessage().replaceAll("\u001b"," ");
-        wsServer.onNewConsoleLinePrinted(message);
+        wcServer.onNewConsoleLinePrinted(message);
         return null;
 	}
 

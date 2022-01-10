@@ -4,7 +4,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
 public class LoginManager {
-	private ArrayList<ConnectedUser> loggedInUsers = new ArrayList<ConnectedUser>();
+	private ArrayList<ConnectedUser> loggedInUsers = new ArrayList<>();
 	private static LoginManager instance;
 	
 	private LoginManager() {}
@@ -27,10 +27,8 @@ public class LoginManager {
 	 * Logs user out
 	 * @param address User to logout
 	 */
-	public void logOut(InetSocketAddress address) {
-		for(ConnectedUser user : loggedInUsers.toArray(new ConnectedUser[loggedInUsers.size()]))
-			if(user.getSocketAddress().equals(address))
-				loggedInUsers.remove(user);
+	public void logOut(String address) {
+		loggedInUsers.removeIf(user -> user.getAddress().equals(address));
 	}
 	
 	/**
@@ -38,9 +36,9 @@ public class LoginManager {
 	 * @param address socket of the user
 	 * @return User object, null if no user logged in from that address
 	 */
-	public ConnectedUser getUser(InetSocketAddress address) {
+	public ConnectedUser getUser(String address) {
 		for(ConnectedUser user : loggedInUsers)
-			if(user.getSocketAddress().equals(address))
+			if(user.getAddress().equals(address))
 				return user;
 		return null;
 	}
@@ -50,9 +48,9 @@ public class LoginManager {
 	 * @param address User to check
 	 * @return true if user is logged in, false otherwise
 	 */
-	public boolean isLoggedIn(InetSocketAddress address, String token) {
+	public boolean isLoggedIn(String address, String token) {
 		for(ConnectedUser user : loggedInUsers)
-			if(user.getSocketAddress().equals(address) && user.getToken().equals(token))
+			if(user.getAddress().equals(address) && user.getToken().equals(token))
 				return true;
 		return false;
 	}
@@ -62,9 +60,9 @@ public class LoginManager {
 	 * @param address User to check
 	 * @return true if user is logged in, false otherwise
 	 */
-	public boolean isSocketConnected(InetSocketAddress address) {
+	public boolean isAddressConnected(String address) {
 		for(ConnectedUser user : loggedInUsers)
-			if(user.getSocketAddress().equals(address))
+			if(user.getAddress().equals(address))
 				return true;
 		return false;
 	}

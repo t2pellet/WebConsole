@@ -1,37 +1,41 @@
 package es.mesacarlos.webconsole;
 
-import es.mesacarlos.webconsole.config.WebConsoleConfig;
+import es.mesacarlos.webconsole.config.WCConfig;
 import es.mesacarlos.webconsole.minecraft.WebConsoleCommand;
+import es.mesacarlos.webconsole.server.WCServer;
 import es.mesacarlos.webconsole.util.Internationalization;
 import es.mesacarlos.webconsole.util.LogFilter;
-import es.mesacarlos.webconsole.websocket.WSServer;
+import fi.iki.elonen.NanoHTTPD;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.loader.api.FabricLoader;
+import net.lingala.zip4j.ZipFile;
 import net.minecraft.server.MinecraftServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.Filter;
-import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
 
 import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.security.KeyStore;
 
 public class WebConsole implements ModInitializer {
 
 	public static final String MODID = "webconsole";
 	public static final Logger LOGGER = LogManager.getLogger(MODID);
+	public static final String WEB_PATH = FabricLoader.getInstance().getGameDir().toString() + "/webconsole";
 	// MC Server
 	private static MinecraftServer mcServer;
 
 	// Websocket server and thread
-	private WSServer server;
+	private WCServer server;
 	private Thread wsThread;
 
 	public static MinecraftServer getMCServer() {
@@ -40,18 +44,42 @@ public class WebConsole implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		LOGGER.info("Initializing WebConsole...");
+
 		// Register Config
-		AutoConfig.register(WebConsoleConfig.class, JanksonConfigSerializer::new);
+		AutoConfig.register(WCConfig.class, JanksonConfigSerializer::new);
 
 		//Change language to user-specified language.
-		Internationalization.setCurrentLocale(WebConsoleConfig.getInstance().getLanguage());
+		Internationalization.setCurrentLocale(WCConfig.getInstance().getLanguage());
 
 		// Register command
 		CommandRegistrationCallback.EVENT.register(WebConsoleCommand::register);
 
+		// Unzip server
+		File wcFolder = new File(WEB_PATH);
+		// Extract server if it isn't there
+		File htmlFile = new File(wcFolder, "index.html");
+		if (!htmlFile.exists()) {
+			LOGGER.info(Internationalization.getPhrase("unzip"));
+			wcFolder.mkdirs();
+			try {
+				// Copy zip
+				InputStream is = WebConsole.class.getResourceAsStream("/client.zip");
+				File wcZipFile = new File(wcFolder, "client.zip");
+				Files.copy(is, wcZipFile.toPath());
+				// Unzip
+				ZipFile zipFile = new ZipFile(wcZipFile);
+				zipFile.extractAll(wcFolder.getAbsolutePath());
+				LOGGER.info(Internationalization.getPhrase("unzip-success"));
+			} catch (IOException ex) {
+				LOGGER.error(Internationalization.getPhrase("unzip-error") + ex.getMessage());
+				ex.printStackTrace();
+			}
+		}
+
 		// On Server Start
 		ServerLifecycleEvents.SERVER_STARTING.register(mcServer -> {
-			this.mcServer = mcServer;
+			WebConsole.mcServer = mcServer;
 			//Start WebSocket Server
 			try {
 				startWS();
@@ -60,7 +88,7 @@ public class WebConsole implements ModInitializer {
 				e.printStackTrace();
 			}
 			//This filter is used to read the whole console.
-			Filter f = new LogFilter(getWSServer());
+			Filter f = new LogFilter(server);
 			((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger()).addFilter(f);
 		});
 		// On Server Stop
@@ -79,14 +107,14 @@ public class WebConsole implements ModInitializer {
 	 */
 	private void startWS() throws Exception {
 		// Create WebSocket server
-		server = new WSServer(WebConsoleConfig.getInstance().getSocketAdress());
-		
-		if(WebConsoleConfig.getInstance().isSslEnabled()) {
+		server = new WCServer(WCConfig.getInstance().host, 80);
+
+		if(WCConfig.getInstance().isSslEnabled()) {
 			// Configure SSL
-			String STORETYPE = WebConsoleConfig.getInstance().getStoreType();
-			String KEYSTORE = WebConsoleConfig.getInstance().getKeyStore();
-			String STOREPASSWORD = WebConsoleConfig.getInstance().getStorePassword();
-			String KEYPASSWORD = WebConsoleConfig.getInstance().getKeyPassword();
+			String STORETYPE = WCConfig.getInstance().getStoreType();
+			String KEYSTORE = WCConfig.getInstance().getKeyStore();
+			String STOREPASSWORD = WCConfig.getInstance().getStorePassword();
+			String KEYPASSWORD = WCConfig.getInstance().getKeyPassword();
 			
 			KeyStore ks = KeyStore.getInstance(STORETYPE);
 			File kf = new File(KEYSTORE);
@@ -94,27 +122,17 @@ public class WebConsole implements ModInitializer {
 			
 			KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 			kmf.init(ks, KEYPASSWORD.toCharArray());
-			TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
-			tmf.init(ks);
-			
-			SSLContext sslContext = null;
-			sslContext = SSLContext.getInstance("TLS");
-			sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
-			
-			server.setWebSocketFactory(new DefaultSSLWebSocketServerFactory(sslContext));
+			server.setServerSocketFactory(new NanoHTTPD.SecureServerSocketFactory(NanoHTTPD.makeSSLSocketFactory(ks, kmf), null));
 		}
 
 		// Start Server
-		wsThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				server.run();
+		wsThread = new Thread(() -> {
+			try {
+				server.start(60000, false);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		});
 		wsThread.start();
-	}
-
-	public WSServer getWSServer() {
-		return server;
 	}
 }

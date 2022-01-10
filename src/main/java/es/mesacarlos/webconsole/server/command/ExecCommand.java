@@ -1,48 +1,46 @@
-package es.mesacarlos.webconsole.websocket.command;
+package es.mesacarlos.webconsole.server.command;
 
 import es.mesacarlos.webconsole.WebConsole;
 import es.mesacarlos.webconsole.auth.ConnectedUser;
 import es.mesacarlos.webconsole.auth.LoginManager;
-import es.mesacarlos.webconsole.config.WebConsoleConfig;
 import es.mesacarlos.webconsole.config.UserData;
 import es.mesacarlos.webconsole.config.UserType;
+import es.mesacarlos.webconsole.config.WCConfig;
+import es.mesacarlos.webconsole.server.WCServer;
 import es.mesacarlos.webconsole.util.Internationalization;
-import es.mesacarlos.webconsole.websocket.WSServer;
 import net.minecraft.command.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
-import org.java_websocket.WebSocket;
 
 public class ExecCommand implements WSCommand {
 	LoginManager loginManager = LoginManager.getInstance();
 
 	@Override
-	public void execute(WSServer wsServer, WebSocket conn, String command) {
-		ConnectedUser u = LoginManager.getInstance().getUser(conn.getRemoteSocketAddress());
+	public void execute(WCServer.WCSocket socket, String address, String command) {
+		ConnectedUser u = LoginManager.getInstance().getUser(address);
 		if(u == null || u.getUserType() != UserType.ADMIN) {
 			if(u != null)
 				WebConsole.LOGGER.warn(Internationalization.getPhrase("no-send-permission-console", u, command));
 			return;
 		}
 
-		boolean allowCommand = checkWhitelist(conn, command);
+		boolean allowCommand = checkWhitelist(address, command);
 		if (!allowCommand) {
 			WebConsole.LOGGER.warn(Internationalization.getPhrase("no-send-permission-console", u, command));
 			return;
 		}
 		
-		WebConsole.LOGGER.info(Internationalization.getPhrase("cmd-executed-console", conn.getRemoteSocketAddress(), Internationalization.utf8ToIso(command)));
+		WebConsole.LOGGER.info(Internationalization.getPhrase("cmd-executed-console", address, Internationalization.utf8ToIso(command)));
 		try {
 			ServerCommandSource source = WebConsole.getMCServer().getCommandSource();
 			WebConsole.getMCServer().getCommandManager().execute(source, command);
 		} catch (CommandException e) {
-			e.printStackTrace();
+			WebConsole.LOGGER.error(e.getMessage());
 		}
-
 	}
 	
-	private boolean checkWhitelist(WebSocket conn, String command) {
-		for(UserData ud : WebConsoleConfig.getInstance().getAllUsers()) {
-			if (ud.getUsername().equals(loginManager.getUser(conn.getRemoteSocketAddress()).getUsername())) {
+	private boolean checkWhitelist(String address, String command) {
+		for(UserData ud : WCConfig.getInstance().getAllUsers()) {
+			if (ud.getUsername().equals(loginManager.getUser(address).getUsername())) {
 
 				if (!ud.isWhitelistEnabled()) { //Skip whitelist check.
 					return true;

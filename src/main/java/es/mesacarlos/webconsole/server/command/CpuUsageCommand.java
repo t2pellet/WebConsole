@@ -1,29 +1,28 @@
-package es.mesacarlos.webconsole.websocket.command;
+package es.mesacarlos.webconsole.server.command;
 
-import java.lang.management.ManagementFactory;
+import es.mesacarlos.webconsole.WebConsole;
+import es.mesacarlos.webconsole.server.WCServer;
+import es.mesacarlos.webconsole.util.Internationalization;
+import es.mesacarlos.webconsole.server.response.CpuUsage;
+import es.mesacarlos.webconsole.server.response.JSONOutput;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-
-import org.java_websocket.WebSocket;
-
-import es.mesacarlos.webconsole.util.Internationalization;
-import es.mesacarlos.webconsole.websocket.WSServer;
-import es.mesacarlos.webconsole.websocket.response.CpuUsage;
+import java.lang.management.ManagementFactory;
 
 public class CpuUsageCommand implements WSCommand {
 
 	@Override
-	public void execute(WSServer wsServer, WebSocket conn, String params) {
+	public void execute(WCServer.WCSocket socket, String address, String command) {
 		try {
 			double usage = getProcessCpuLoad();
-			wsServer.sendToClient(conn, new CpuUsage(Internationalization.getPhrase("cpu-usage-message", usage), usage));
+			socket.sendToClient(new CpuUsage(Internationalization.getPhrase("cpu-usage-message"), usage));
 		} catch (Exception e) {
-			e.printStackTrace();
+			WebConsole.LOGGER.error(e.getMessage());
 		}
-	}
+	};
 	
 	/**
 	 * Check out usage for the whole system

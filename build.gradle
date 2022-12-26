@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.10-SNAPSHOT'
+    id 'fabric-loom' version '1.0+'
     id 'maven-publish'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
@@ -13,6 +13,7 @@ group = project.maven_group
 
 repositories {
     maven { url "https://maven.shedaniel.me/" }
+    mavenCentral()
 }
 
 configurations {
@@ -34,8 +35,8 @@ dependencies {
     shade 'org.nanohttpd:nanohttpd:2.3.1'
     implementation 'org.nanohttpd:nanohttpd-websocket:2.3.1'
     shade 'org.nanohttpd:nanohttpd-websocket:2.3.1'
-    implementation 'net.lingala.zip4j:zip4j:2.9.1'
-    shade 'net.lingala.zip4j:zip4j:2.9.1'
+    implementation 'net.lingala.zip4j:zip4j:2.11.2'
+    shade 'net.lingala.zip4j:zip4j:2.11.2'
 }
 
 processResources {

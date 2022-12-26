@@ -32,7 +32,7 @@ public class ExecCommand implements WSCommand {
 		WebConsole.LOGGER.info(Internationalization.getPhrase("cmd-executed-console", address, Internationalization.utf8ToIso(command)));
 		try {
 			ServerCommandSource source = WebConsole.getMCServer().getCommandSource();
-			WebConsole.getMCServer().getCommandManager().execute(source, command);
+			WebConsole.getMCServer().getCommandManager().executeWithPrefix(source, command);
 		} catch (CommandException e) {
 			WebConsole.LOGGER.error(e.getMessage());
 		}

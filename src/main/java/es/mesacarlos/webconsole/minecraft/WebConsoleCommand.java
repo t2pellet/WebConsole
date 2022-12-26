@@ -1,23 +1,25 @@
 package es.mesacarlos.webconsole.minecraft;
 
-import java.util.ArrayList;
-
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import es.mesacarlos.webconsole.WebConsole;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.server.command.ServerCommandSource;
-import es.mesacarlos.webconsole.auth.LoginManager;
 import es.mesacarlos.webconsole.auth.ConnectedUser;
+import es.mesacarlos.webconsole.auth.LoginManager;
 import es.mesacarlos.webconsole.util.Internationalization;
-import net.minecraft.text.LiteralText;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.Text;
+
+import java.util.ArrayList;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
 
 public class WebConsoleCommand {
 
-	public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean isDedicated) {
+	public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
 		dispatcher.register(literal("WebConsole")
 				.executes(context -> {
 					String version = FabricLoader.getInstance().getModContainer(WebConsole.MODID).get().getMetadata().getVersion().getFriendlyString();
@@ -35,7 +37,7 @@ public class WebConsoleCommand {
 								msg.append("\n");
 						}
 					}
-					context.getSource().sendFeedback(new LiteralText(msg.toString()), false);
+					context.getSource().sendFeedback(Text.literal(msg.toString()), false);
 					return Command.SINGLE_SUCCESS;
 				}));
 	}
